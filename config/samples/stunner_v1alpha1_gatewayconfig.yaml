@@ -1,0 +1,10 @@
+apiVersion: stunner.l7mp.io/v1alpha1
+kind: GatewayConfig
+metadata:
+  name: gatewayconfig-sample
+  namespace: stunner
+spec:
+  stunnerConfig: "stunnerd-configmap"
+  authType: plaintext
+  userName: "user-1"
+  password: "pass-1"
